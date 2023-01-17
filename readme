@@ -1,0 +1,38 @@
+Environments: Python 3.6.10, networkx 1.11
+
+There are four modules, namely node embedding generation ('embedding.py'), training the prediction function on the general prediction problem ('learning.py'), generation of test/validation query pairs with candidate paths ('phase1.py'), and finding the MPSP based on candidate paths ('phase2.py').
+
+input graph format:
+each line refers to an edge and has four elements, namely source node, end node, edge length and edge probabilities.
+
+
+The execution workflow has four steps where each step consists of input -> module -> output (please refer to individual module for hyperparameter description):
+
+(1) input graph -> embedding.py -> node embedding (stored in the folder 'embedding')
+
+Example: python embedding.py --graph BJ --dimensions 128
+
+(2) input graph -> phase1.py -> test/validation query pairs with candidates (stored in the folder 'test' or 'validation')
+
+Example: python phase1.py --graph BJ --output validation --pairs 100 --m 20
+
+(3) input graph, node embedding, validation query pairs -> learning.py -> trained predictive function (stored in the folder 'models')
+
+Example: python learning.py --graph BJ --dimensions 128 --embedder L1 --N 100 --m 20 --ratio 0.1 --length 30 --counter 100
+
+(4) trained predictive function, node embedding, test query pairs, graph for training, graph for deployed -> phase2.py -> results 
+
+Example: python phase2.py --graph BJ --dimensions 128 --trainedGraph BJ --targetGraph BJ --counter 500
+
+Note: For your convenience, we have provided examplar outputs for steps (1) to (3) and step (4) is directly runnable.
+
+Format of output of step (4):
+Six lines in total.
+Line (1): the graph/setting where the prediction function is trained and the graph/setting where the function is deployed.
+Line (2): phase 1 average time and the top k values we are testing.
+Line (3): performance of method RR - the AAP for each k.
+Line (4): performance of FPA - the AAP for each k, ranksum percentiles (i.e., 0,0.25,0.5,0.75,0.8,0.9,0.95 and 1) and average for each k (all of them are stored in a list where the last element refers to the average), and running time. 
+Line (5): performance of Random - with the same format as in Line (4).
+Line (6): performance of LPA - with the same format as in Line (4).
+
+Note that all datasets are avaiable in public and the links are provided in our paper.
